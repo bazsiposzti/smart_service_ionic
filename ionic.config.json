@@ -1,0 +1,7 @@
+{
+  "name": "smart-service",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
