@@ -1,56 +1,65 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-title>Blank</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <Header />
 
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Blank</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
-      <div id="container">
-        <strong>Ready to create an app?</strong>
-        <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <ion-content :fullscreen="true" class="ion-padding">
+      <div v-if="jobStore.isLoading" class="center-text">
+        <ion-spinner></ion-spinner>
       </div>
+
+      <ion-list v-else>
+        <munka-item v-for="job in jobStore.munkak" :key="job.id" :munka="job" />
+      </ion-list>
+
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button @click="isModalOpen = true">
+          <ion-icon :icon="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+
+      <ion-modal :is-open="isModalOpen" @didDismiss="isModalOpen = false">
+      <uj-munka-form @kesz="isModalOpen = false"/>
+      </ion-modal>
+
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+import { onMounted } from "vue";
+import {
+  IonPage,
+  IonContent,
+  IonList,
+  IonSpinner,
+  IonModal,
+  IonFab,
+  IonFabButton,
+  IonIcon,
+} from "@ionic/vue";
+import { add } from "ionicons/icons"; // Ikonok importálása
+import { useMunkaStore } from "@/stores/MunkaStore";
+import { ref } from "vue";
+
+import Header from "@/components/Header.vue";
+import MunkaItem from "@/components/MunkaItem.vue";
+import UjMunkaForm from "@/components/UjMunkaForm.vue";
+
+
+// Store használata
+const jobStore = useMunkaStore();
+
+const isModalOpen = ref(false);
+// Amikor betölt az oldal (mint az onMounted C#-ban)
+onMounted(() => {
+  jobStore.fetchMunkak();
+});
+
 </script>
 
 <style scoped>
-#container {
+.center-text {
   text-align: center;
-  
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-  
-  color: #8c8c8c;
-  
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
+  margin-top: 20px;
 }
 </style>
