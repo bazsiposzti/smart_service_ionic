@@ -51,8 +51,10 @@ import {
   IonIcon,
   IonItemSliding,
   IonItemOptions,
-  IonItemOption
+  IonItemOption,
 } from "@ionic/vue";
+
+import { showToast } from "@/utils/toast";
 import { add, trash } from "ionicons/icons"; // Ikonok importálása
 import { useMunkaStore } from "@/stores/MunkaStore";
 import { ref } from "vue";
@@ -94,6 +96,8 @@ const munkaTorlese = async (id: string | undefined) => {
 
   if(biztosan) {
     await jobStore.deleteMunka(id);
+
+    await showToast('Munkalap sikeresen törölve! 🗑️', 'danger')
   }
 }
 

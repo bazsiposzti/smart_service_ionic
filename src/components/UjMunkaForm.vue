@@ -77,6 +77,7 @@ import {
   IonSelectOption,
   IonIcon
 } from "@ionic/vue";
+import { showToast } from "@/utils/toast";
 
 const props = defineProps<{
   szerkesztendoMunka?: Munkak | null
@@ -113,6 +114,8 @@ const mentes = async() => {
       osszeg: form.value.osszeg,
       statusz: form.value.statusz
     })
+
+    await showToast('Munkalap sikeresen frissítve! ✏️', 'success')
   }
   else
   {
@@ -127,6 +130,7 @@ const mentes = async() => {
     };
 
     await jobStore.addMunka(ujAdat);
+    await showToast('Új munkalap sikeresen mentve! ✅', 'success')
   }
     bezar(true);
 }

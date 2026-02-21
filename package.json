@@ -23,7 +23,8 @@
     "ionicons": "^7.0.0",
     "pinia": "^3.0.4",
     "vue": "^3.3.0",
-    "vue-router": "^4.2.0"
+    "vue-router": "^4.2.0",
+    "vue3-toastify": "^0.2.8"
   },
   "devDependencies": {
     "@capacitor/cli": "8.1.0",
