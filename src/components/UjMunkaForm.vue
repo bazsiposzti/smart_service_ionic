@@ -1,9 +1,9 @@
 <template>
   <ion-header>
     <ion-toolbar color="primary">
-      <ion-title>Új munkalap</ion-title>
+      <ion-title>{{ szerkesztendoMunka ? 'Munka szerkesztése' : 'Új munkalap' }}</ion-title>
       <ion-buttons slot="end">
-        <ion-buttons @click="bezar(false)">Mégse</ion-buttons>
+        <ion-buttons  @click="bezar(false)" class="bezar-gomb" fill="clear"><ion-icon :icon="close"></ion-icon></ion-buttons>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
@@ -39,21 +39,29 @@
           label="Összeg (Ft):"
           label-placement="floating"
           v-model="form.osszeg"
-          placeholder="Pl. Kovács Kft."
         ></ion-input>
       </ion-item>
+
+      <ion-item>
+        <ion-select label="Státusz:" v-model="form.statusz">
+          <ion-select-option value="uj">Új</ion-select-option>
+          <ion-select-option value="folyamatban">folyamatban</ion-select-option>
+          <ion-select-option value="kesz">Kész</ion-select-option>
+        </ion-select>
+      </ion-item>
+
     </ion-list>
 
-    <ion-button expand="block" class="ion-margin-top" @click="mentes"></ion-button>
-    Mentés
+    <ion-button expand="block" class="ion-margin-top" @click="mentes">{{ szerkesztendoMunka ? 'Frissítés' : 'Mentés' }}</ion-button>
   </ion-content>
 </template>
 
 <script setup lang="ts">
 
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useMunkaStore } from "@/stores/MunkaStore";
 import type { Munkak } from "@/models/Munkak";
+import { close } from "ionicons/icons";
 
 import {
   IonHeader,
@@ -65,7 +73,14 @@ import {
   IonInput,
   IonButton,
   IonButtons,
+  IonSelect,
+  IonSelectOption,
+  IonIcon
 } from "@ionic/vue";
+
+const props = defineProps<{
+  szerkesztendoMunka?: Munkak | null
+}>();
 
 const emit = defineEmits(['kesz'])
 
@@ -75,11 +90,33 @@ const form = ref({
     kliens: '',
     cim: '',
     megjegyzes: '',
-    osszeg: 0
+    osszeg: 0,
+    statusz: 'uj' as 'uj' | 'folyamatban' | 'kesz'
+});
+
+onMounted(() => {
+  if(props.szerkesztendoMunka){
+    form.value.kliens = props.szerkesztendoMunka.kliens;
+    form.value.cim = props.szerkesztendoMunka.cim || '';
+    form.value.megjegyzes = props.szerkesztendoMunka.megjegyzes;
+    form.value.osszeg = props.szerkesztendoMunka.osszeg;
+    form.value.statusz = props.szerkesztendoMunka.statusz;
+  }
 });
 
 const mentes = async() => {
-    const ujAdat: Munkak = {
+  if(props.szerkesztendoMunka && props.szerkesztendoMunka.id){
+    await jobStore.updateMunka(props.szerkesztendoMunka.id, {
+      kliens: form.value.kliens,
+      cim: form.value.cim,
+      megjegyzes: form.value.megjegyzes,
+      osszeg: form.value.osszeg,
+      statusz: form.value.statusz
+    })
+  }
+  else
+  {
+        const ujAdat: Munkak = {
         kliens: form.value.kliens,
         cim: form.value.cim,
         megjegyzes: form.value.megjegyzes,
@@ -90,14 +127,12 @@ const mentes = async() => {
     };
 
     await jobStore.addMunka(ujAdat);
+  }
     bezar(true);
-    form.value = {kliens: '', cim: '', megjegyzes: '', osszeg: 0}
 }
 
 const bezar = (sikeres: boolean) => {
     emit('kesz')
 }
-
-
 
 </script>

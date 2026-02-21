@@ -9,10 +9,16 @@ defineProps<{
 
 <template>
   <ion-item>
-    <ion-label>
+    <ion-label class="ion-text-center">
       <h2>{{ munka.kliens }}</h2>
       <p>{{ munka.megjegyzes }}</p>
       <ion-badge color="secondary">{{ munka.statusz }}</ion-badge>
+      <h3>{{ munka.osszeg }} Ft</h3>
     </ion-label>
   </ion-item>
 </template>
+
+<style scoped>
+
+
+</style>

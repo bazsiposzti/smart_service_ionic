@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { db } from "@/firebaseConfig";
 import type { Munkak } from "@/models/Munkak";
-import { getDocs, addDoc, collection } from "firebase/firestore";
+import { getDocs, addDoc, collection, doc, updateDoc, deleteDoc } from "firebase/firestore";
 
 export const useMunkaStore = defineStore('munkaStore', {
     state: () => ({
@@ -34,6 +34,34 @@ export const useMunkaStore = defineStore('munkaStore', {
             }
             catch(error){
                 console.error("Hiba mentéskor:", error)
+            }
+        },
+
+        async updateMunka(id: string, frissitettAdat: Partial<Munkak>){
+            try {
+                // Megkeressük a konkrét dokumentumot az ID alapján
+                const munkaRef = doc(db, 'munkak', id)
+
+                // Frissítjük a Firebase-ben
+                await updateDoc(munkaRef, frissitettAdat);
+
+                // Újratöltjük a listát, hogy látszódjon a változás
+                await this.fetchMunkak()
+            } catch (error) {
+                console.error("Hiba frissítéskor:", error);
+            }
+        },
+
+        async deleteMunka(id: string){
+            try {
+                //megkeressük id alapján firebaseben
+                const deleteMunkaRef = doc(db, 'munkak', id)
+                //töröljük
+                await deleteDoc(deleteMunkaRef)
+                //betöltjük
+                await this.fetchMunkak()
+            } catch (error) {
+                console.error("Hiba törléskor:", error);
             }
         }
     }
